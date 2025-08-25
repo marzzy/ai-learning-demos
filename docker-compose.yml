@@ -1,0 +1,13 @@
+services:
+  ollama:
+    image: ${IMAGE}                # fixed name/tag, read from .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/arm64
+    container_name: ${SERVICE}
+    ports:
+      - "11434:11434"
+    # Do NOT mount a volume at /root/.ollama, or you’ll hide the baked models.
+    restart: unless-stopped
