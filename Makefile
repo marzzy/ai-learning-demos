@@ -2,9 +2,9 @@
 COMPOSE ?= docker-compose.yml
 IMAGE   ?= $(shell grep -E '^IMAGE=' .env | cut -d= -f2)
 SERVICE ?= $(shell grep -E '^SERVICE=' .env | cut -d= -f2)
-ARCH    ?= aarch64              # Apple Silicon
+ARCH    ?= aarch64 # Apple Silicon
 CPUS    ?= 6
-MEM     ?= 12                   # GB
+MEM     ?= 12 # GB
 
 # Models baked in your Dockerfile
 CHAT_MODEL ?= llama3.1
@@ -16,7 +16,7 @@ BASE_URL ?= http://localhost:11434
 # ---- Colima lifecycle ----
 .PHONY: colima-start colima-stop
 colima-start:
-	colima start --arch $(ARCH) --cpu $(CPUS) --memory $(MEM) --vz
+	colima start --arch $(ARCH) --cpu $(CPUS) --memory $(MEM)
 
 colima-stop:
 	colima stop
@@ -34,7 +34,7 @@ ensure-image:
 	fi
 
 up:
-	docker compose -f $(COMPOSE) up -d
+	docker compose -f $(COMPOSE) up -d --no-build
 
 down:
 	docker compose -f $(COMPOSE) down
@@ -43,16 +43,16 @@ build:
 	docker compose -f $(COMPOSE) build
 
 # Ensure image, then up (no rebuild if present)
-up-build: ensure-image up --no-build
+up-build: ensure-image up
 
 # Force rebuild (ignore cache), then start
 rebuild:
 	$(MAKE) build --no-cache
-	$(MAKE) up
+	docker compose -f $(COMPOSE) up -d
 
 restart:
 	$(MAKE) down
-	$(MAKE) up --no-build
+	$(MAKE) up
 
 logs:
 	docker compose -f $(COMPOSE) logs -f $(SERVICE)
